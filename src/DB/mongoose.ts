@@ -1,22 +1,12 @@
-import mongoose, { Mongoose } from "mongoose";
+import mongoose from "mongoose";
+import type { Mongoose } from "mongoose";
 
 const DB_CONNECTION = process.env.DB_CONNECTION as string;
 
-if (!DB_CONNECTION) {
-  throw new Error("Add DB_CONNECTION to env file");
-}
+if (!DB_CONNECTION) throw new Error("Add DB_CONNECTION to env file");
 
-interface ICached {
-  conn: Mongoose | null;
-  promise: Promise<Mongoose> | null;
-}
-
-let cached: ICached = (global as any).mongoose;
-
-if (!cached) {
-  cached = { conn: null, promise: null };
-  (global as any).mongoose = cached;
-}
+const cached = global.mongoose ?? { conn: null, promise: null };
+global.mongoose = cached;
 
 export async function connectDB(): Promise<Mongoose> {
   if (cached.conn) return cached.conn;

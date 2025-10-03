@@ -10,14 +10,23 @@ export async function POST(req: Request) {
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return NextResponse.json({ error: "User already exists" }, { status: 400 });
+      return NextResponse.json(
+        { error: "User already exists" },
+        { status: 400 }
+      );
     }
 
     const newUser = new User({ email, password });
     await newUser.save();
 
-    return NextResponse.json({ message: "User created successfully" }, { status: 201 });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { message: "User created successfully" },
+      { status: 201 }
+    );
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+    return NextResponse.json({ error: "Unknown error" }, { status: 500 });
   }
 }
